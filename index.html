@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MPI Absensi Digital Kelas 3A - SDN Karanganyar Gunung 02</title>
+    <!-- Tailwind CSS for Responsive Layouts & Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#1E40AF',
+                            light: '#3B82F6',
+                            sky: '#E0F2FE',
+                            yellow: '#F59E0B',
+                            green: '#10B981',
+                            red: '#EF4444',
+                            purple: '#8B5CF6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Fredoka', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Font Fredoka & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', 'Inter', sans-serif;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            overflow: hidden;
+            background: url('https://imgur.com/m4QFJbp.png') center/cover no-repeat fixed, linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #e0e7ff 100%);
+        }
+
+        /* Modern 3D Push Button Effect */
+        .btn-3d {
+            transition: all 0.12s ease-out;
+            box-shadow: 0 6px 0 shadow-color, 0 8px 15px rgba(0,0,0,0.15);
+            position: relative;
+            top: 0;
+        }
+
+        .btn-3d:active {
+            top: 5px;
+            box-shadow: 0 1px 0 shadow-color, 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Status Custom Colors & 3D Shadows */
+        .card-belum {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 3px solid rgba(203, 213, 225, 0.85);
+            --tw-shadow-color: #94a3b8;
+            color: #1e293b;
+        }
+        .card-belum:hover, .card-belum:focus {
+            border-color: #3b82f6;
+            background: rgba(239, 246, 255, 0.85);
+        }
+
+        .card-hadir {
+            background: rgba(209, 250, 229, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 3px solid #10b981;
+            --tw-shadow-color: #059669;
+            color: #065f46;
+        }
+
+        .card-sakit {
+            background: rgba(254, 243, 199, 0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 3px solid #f59e0b;
+            --tw-shadow-color: #d97706;
+            color: #92400e;
+        }
+
+        .card-izin {
+            background: rgba(224, 242, 254, 0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 3px solid #0284c7;
+            --tw-shadow-color: #0369a1;
+            color: #075985;
+        }
+
+        .card-alpa {
+            background: rgba(254, 226, 226, 0.8);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 3px solid #ef4444;
+            --tw-shadow-color: #dc2626;
+            color: #991b1b;
+        }
+
+        /* Pulse Animation for Unattended */
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.015); }
+        }
+        .pulse-card {
+            animation: gentle-pulse 3s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar for Modals */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+        }
+
+        /* Print Layout Rules */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                overflow: visible !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 1.5cm;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between p-2 md:p-3 space-y-2 select-none">
+
+    <!-- Canvas Confetti Overlay -->
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- HEADER BAR (NO SCROLL, FIXED ASPECT FIT) -->
+    <header class="no-print bg-white/90 backdrop-blur border-2 border-blue-200 rounded-2xl p-2.5 shadow-lg flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <!-- School & Class Identification -->
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-2xl shadow-md tracking-wider">
+                3A
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-extrabold text-blue-900 text-lg md:text-xl leading-tight">SDN KARANGANYAR GUNUNG 02</h1>
+                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-bold">Fase B</span>
+                </div>
+                <p class="text-xs text-slate-600 font-medium">
+                    TA 2026/2027 • Wali Kelas: <span class="font-semibold text-slate-800">Muhammad Yusuf Fadhlulloh, S.Pd., Gr.</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Attendance Stats Badges -->
+        <div class="flex items-center gap-1.5 md:gap-2 flex-wrap">
+            <div class="bg-emerald-100 border-2 border-emerald-400 px-3 py-1 rounded-xl text-center shadow-sm">
+                <span class="text-[10px] text-emerald-700 font-bold block uppercase tracking-wider">✓ HADIR</span>
+                <span id="statHadir" class="text-lg md:text-xl font-extrabold text-emerald-800">0 / 28</span>
+            </div>
+            <div class="bg-amber-100 border-2 border-amber-300 px-2.5 py-1 rounded-xl text-center shadow-sm">
+                <span class="text-[10px] text-amber-700 font-bold block uppercase tracking-wider">🤒 SAKIT</span>
+                <span id="statSakit" class="text-base md:text-lg font-extrabold text-amber-800">0</span>
+            </div>
+            <div class="bg-sky-100 border-2 border-sky-300 px-2.5 py-1 rounded-xl text-center shadow-sm">
+                <span class="text-[10px] text-sky-700 font-bold block uppercase tracking-wider">📝 IZIN</span>
+                <span id="statIzin" class="text-base md:text-lg font-extrabold text-sky-800">0</span>
+            </div>
+            <div class="bg-rose-100 border-2 border-rose-300 px-2.5 py-1 rounded-xl text-center shadow-sm">
+                <span class="text-[10px] text-rose-700 font-bold block uppercase tracking-wider">❌ ALPA</span>
+                <span id="statAlpa" class="text-base md:text-lg font-extrabold text-rose-800">0</span>
+            </div>
+            <div class="bg-slate-100 border-2 border-slate-300 px-3 py-1 rounded-xl text-center shadow-sm">
+                <span class="text-[10px] text-slate-600 font-bold block uppercase tracking-wider">⏳ BELUM</span>
+                <span id="statBelum" class="text-lg md:text-xl font-extrabold text-slate-700">28</span>
+            </div>
+        </div>
+
+        <!-- Clock & Teacher Button -->
+        <div class="flex items-center space-x-3">
+            <div class="text-right hidden sm:block">
+                <div id="liveClock" class="text-base md:text-lg font-black text-slate-800 tracking-wider">00:00:00</div>
+                <div id="liveDate" class="text-[11px] font-bold text-slate-500">Senin, 21 Sep 2026</div>
+            </div>
+            <button onclick="openTeacherAuth()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:scale-95 text-white font-bold text-xs md:text-sm px-3.5 py-2.5 rounded-xl shadow-md flex items-center gap-1.5 transition">
+                <span>🔐</span>
+                <span class="hidden md:inline">MODE GURU</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- INSTRUCTION BANNER -->
+    <div class="no-print bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 border-2 border-amber-400 rounded-xl px-4 py-1.5 flex items-center justify-between shadow-sm shrink-0">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">👋</span>
+            <span class="font-extrabold text-slate-800 text-sm md:text-base">SELAMAT DATANG, KELAS 3A!</span>
+            <span class="text-xs md:text-sm font-semibold text-slate-700 hidden sm:inline">— Ayo Absen! Sentuh Namamu di Bawah ini 👆</span>
+        </div>
+        <div class="text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-0.5 rounded-lg border border-amber-300">
+            Papan Absensi Digital
+        </div>
+    </div>
+
+    <!-- MAIN GRID CONTAINER (4 COLUMNS × 7 ROWS = 28 STUDENTS, strictly fit 100% viewport) -->
+    <main class="no-print flex-1 min-h-0 w-full">
+        <div id="studentGrid" class="h-full w-full grid grid-cols-4 grid-rows-7 gap-2 md:gap-2.5">
+            <!-- Dynamic 28 Student Cards loaded via JavaScript -->
+        </div>
+    </main>
+
+    <!-- FOOTER TIP -->
+    <footer class="no-print text-center text-[11px] font-semibold text-slate-500 shrink-0 flex items-center justify-between px-2">
+        <span>🎒 Media Pembelajaran Interaktif (MPI) Touchscreen SD</span>
+        <span>✨ SDN Karanganyar Gunung 02 - Semarang</span>
+    </footer>
+
+    <!-- MODAL: GREETING & SUCCESS POPUP -->
+    <div id="greetingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white border-4 border-yellow-400 rounded-3xl p-6 md:p-8 max-w-md w-full text-center shadow-2xl transform scale-90 transition-all duration-300" id="greetingBox">
+            <div id="greetingIcon" class="text-6xl mb-3 animate-bounce">🎉</div>
+            <h2 id="greetingTitle" class="text-2xl md:text-3xl font-black text-blue-900 mb-2">Halo, Zahra!</h2>
+            <p id="greetingMessage" class="text-base md:text-lg font-bold text-slate-700 mb-6">
+                Selamat belajar hari ini! Tetap semangat! 🚀📚
+            </p>
+            <button onclick="closeGreetingModal()" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-extrabold text-lg py-3 rounded-2xl shadow-lg active:scale-95 transition">
+                Selesai (OK) 👍
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: TEACHER AUTHENTICATION (PIN PASSCODE) -->
+    <div id="teacherAuthModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border-4 border-indigo-500 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div class="text-4xl mb-2">🔐</div>
+            <h3 class="text-xl font-black text-slate-800 mb-1">Akses Mode Guru</h3>
+            <p class="text-xs text-slate-500 font-medium mb-4">Masukkan PIN Akses Guru (Default: <span class="font-mono font-bold text-indigo-600">1234</span>)</p>
+            
+            <input type="password" id="pinInput" placeholder="Masukkan PIN" maxlength="6" class="w-full text-center text-2xl font-bold tracking-widest border-2 border-indigo-200 rounded-xl py-2 mb-4 focus:outline-none focus:border-indigo-600 bg-indigo-50">
+            
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="closeTeacherAuth()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl transition">
+                    Batal
+                </button>
+                <button onclick="verifyTeacherPin()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow transition">
+                    Masuk Mode Guru
+                </button>
+            </div>
+            <p id="pinError" class="text-xs font-bold text-rose-600 mt-3 hidden">⚠️ PIN salah! Coba lagi.</p>
+        </div>
+    </div>
+
+    <!-- MODAL: TEACHER DASHBOARD (MODE GURU) -->
+    <div id="teacherDashboardModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-6 hidden">
+        <div class="bg-white border-4 border-indigo-600 rounded-3xl max-w-5xl w-full h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Dashboard Header -->
+            <div class="bg-gradient-to-r from-indigo-700 to-purple-800 text-white p-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📊</span>
+                    <div>
+                        <h2 class="text-lg md:text-xl font-black">PANEL KONTROL GURU & REKAP ABSENSI</h2>
+                        <p class="text-xs text-indigo-200">SDN Karanganyar Gunung 02 - Kelas 3A</p>
+                    </div>
+                </div>
+                <button onclick="closeTeacherDashboard()" class="bg-white/20 hover:bg-white/30 text-white font-bold px-3 py-1.5 rounded-xl text-sm transition">
+                    ✕ Tutup Mode Guru
+                </button>
+            </div>
+
+            <!-- Dashboard Content Container -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-5">
+                
+                <!-- Action Controls Banner -->
+                <div class="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-900 uppercase mb-1">Pilih Tanggal Absensi:</label>
+                        <input type="date" id="teacherDatePicker" onchange="loadTeacherDateData()" class="border-2 border-indigo-300 rounded-xl px-3 py-1.5 font-bold text-slate-800 text-sm focus:outline-none focus:border-indigo-600">
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="openExportModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition">
+                            📥 EKSPOR REKAP (EXCEL/CSV)
+                        </button>
+                        <button onclick="triggerPrint()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition">
+                            🖨️ CETAK REKAP / PDF
+                        </button>
+                        <button onclick="confirmResetToday()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5 transition">
+                            🔄 RESET HARI INI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Summary Statistics Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-emerald-50 border-2 border-emerald-300 p-3 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-emerald-700 uppercase block">✓ HADIR</span>
+                        <span id="tdHadir" class="text-2xl font-black text-emerald-800">0</span>
+                    </div>
+                    <div class="bg-amber-50 border-2 border-amber-300 p-3 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-amber-700 uppercase block">🤒 SAKIT</span>
+                        <span id="tdSakit" class="text-2xl font-black text-amber-800">0</span>
+                    </div>
+                    <div class="bg-sky-50 border-2 border-sky-300 p-3 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-sky-700 uppercase block">📝 IZIN</span>
+                        <span id="tdIzin" class="text-2xl font-black text-sky-800">0</span>
+                    </div>
+                    <div class="bg-rose-50 border-2 border-rose-300 p-3 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-rose-700 uppercase block">❌ ALPA</span>
+                        <span id="tdAlpa" class="text-2xl font-black text-rose-800">0</span>
+                    </div>
+                    <div class="bg-slate-100 border-2 border-slate-300 p-3 rounded-2xl text-center col-span-2 sm:col-span-1">
+                        <span class="text-xs font-bold text-slate-600 uppercase block">⏳ BELUM ABSEN</span>
+                        <span id="tdBelum" class="text-2xl font-black text-slate-700">28</span>
+                    </div>
+                </div>
+
+                <!-- Student Status Editor Table -->
+                <div class="bg-white border-2 border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 font-bold text-slate-800 text-sm flex justify-between items-center">
+                        <span>📋 DAFTAR STATUS SISWA (28 ORANG)</span>
+                        <span class="text-xs font-normal text-slate-500">Ubah status siswa kapan saja secara manual</span>
+                    </div>
+                    <div class="divide-y divide-slate-100 max-h-[380px] overflow-y-auto" id="teacherStudentTable">
+                        <!-- Table Rows dynamic injection -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EXPORT OPTIONS -->
+    <div id="exportModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border-4 border-emerald-600 rounded-3xl p-6 max-w-xl w-full shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">📊</span>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-800">Pilih Format & Periode Ekspor</h3>
+                        <p class="text-xs text-slate-500">Unduh data absensi kompatibel dengan Microsoft Excel / CSV</p>
+                    </div>
+                </div>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl">✕</button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Daily Export Option -->
+                <div class="bg-emerald-50 border-2 border-emerald-300 p-4 rounded-2xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-extrabold text-emerald-900 text-sm md:text-base flex items-center gap-1.5">
+                            <span>📅</span> EKSPOR ABSENSI HARI INI
+                        </h4>
+                        <span class="text-xs bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded-full" id="exportTodayBadge">2026-09-21</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-3">Mengunduh file rekap absensi lengkap 28 siswa untuk tanggal terpilih.</p>
+                    <button onclick="exportDailyCSV()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+                        📥 Download CSV / Excel Harian
+                    </button>
+                </div>
+
+                <!-- Period Export Option -->
+                <div class="bg-indigo-50 border-2 border-indigo-300 p-4 rounded-2xl">
+                    <h4 class="font-extrabold text-indigo-900 text-sm md:text-base flex items-center gap-1.5 mb-2">
+                        <span>📅</span> EKSPOR REKAP PERIODE (BULANAN / MINGGUAN)
+                    </h4>
+                    <p class="text-xs text-slate-600 mb-3">Menghasilkan matriks rekap kehadiran (Kode H, S, I, A) seluruh siswa dalam rentang tanggal.</p>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Tanggal Mulai:</label>
+                            <input type="date" id="exportStartDate" class="w-full border-2 border-indigo-200 rounded-xl px-2.5 py-1 text-xs font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Tanggal Akhir:</label>
+                            <input type="date" id="exportEndDate" class="w-full border-2 border-indigo-200 rounded-xl px-2.5 py-1 text-xs font-bold">
+                        </div>
+                    </div>
+
+                    <button onclick="exportPeriodCSV()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+                        📥 Download Matriks Rekap Periode (CSV)
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-5 text-right">
+                <button onclick="closeExportModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2 rounded-xl text-sm">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINT ONLY TEMPLATE (Standard A4 Format) -->
+    <div class="print-only p-4">
+        <!-- School Header -->
+        <div class="text-center border-b-4 border-slate-900 pb-3 mb-4">
+            <h1 class="text-2xl font-black uppercase tracking-wide">SDN KARANGANYAR GUNUNG 02</h1>
+            <h2 class="text-lg font-bold uppercase tracking-wider">REKAP ABSENSI DIGITAL KELAS 3A (FASE B)</h2>
+            <p class="text-xs font-semibold">Tahun Ajaran 2026/2027 • Tanggal Cetak: <span id="printDateHeader">21 September 2026</span></p>
+            <p class="text-xs font-semibold">Wali Kelas: Muhammad Yusuf Fadhlulloh, S.Pd., Gr.</p>
+        </div>
+
+        <!-- Print Table -->
+        <table class="w-full text-xs border-collapse border border-slate-400 mb-6">
+            <thead>
+                <tr class="bg-slate-200 border-b border-slate-400">
+                    <th class="border border-slate-400 p-2 text-center w-10">No</th>
+                    <th class="border border-slate-400 p-2 text-left">Nama Siswa</th>
+                    <th class="border border-slate-400 p-2 text-center w-28">Tanggal</th>
+                    <th class="border border-slate-400 p-2 text-center w-24">Waktu</th>
+                    <th class="border border-slate-400 p-2 text-center w-28">Status Kehadiran</th>
+                </tr>
+            </thead>
+            <tbody id="printTableBody">
+                <!-- Injected dynamic rows -->
+            </tbody>
+        </table>
+
+        <!-- Summary & Signatures -->
+        <div class="flex justify-between items-start text-xs pt-4">
+            <div class="border border-slate-300 p-3 rounded w-64">
+                <p class="font-bold mb-1">Ringkasan Kehadiran Hari Ini:</p>
+                <p>✓ Hadir: <span id="printHadirCount">0</span> Siswa</p>
+                <p>🤒 Sakit: <span id="printSakitCount">0</span> Siswa</p>
+                <p>📝 Izin: <span id="printIzinCount">0</span> Siswa</p>
+                <p>❌ Alpa: <span id="printAlpaCount">0</span> Siswa</p>
+                <p>⏳ Belum Absen: <span id="printBelumCount">0</span> Siswa</p>
+                <p class="font-bold border-t mt-1 pt-1">Total Siswa: 28 Orang</p>
+            </div>
+
+            <div class="text-center pr-8">
+                <p>Semarang, <span id="printFooterDate">21 September 2026</span></p>
+                <p class="mb-14">Wali Kelas 3A</p>
+                <p class="font-bold underline">Muhammad Yusuf Fadhlulloh, S.Pd., Gr.</p>
+                <p class="text-[10px]">NIP. 19930812 202601 1 002</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------
+        // CONSTANTS & INITIAL DATA
+        // -------------------------------------------------------------
+        const STUDENT_NAMES = [
+            "Zahra", "Bagas", "Shakilla", "Zianisa",
+            "Delvino", "Abel", "Adam", "Syafira",
+            "Khalilo", "Faza", "Athifa", "Elfahreza",
+            "Ezhar", "Aqila", "Nazran", "Thalita",
+            "Arsya", "Alvaro", "Keysil", "Jibril",
+            "Zidane", "Arkananta", "Nindy", "Abimanyu",
+            "Sachio", "Nazaleya", "Ziva", "Jonathan"
+        ];
+
+        const TEACHER_PIN = "1234";
+
+        // Web Audio Synthesizer for offline sound effects
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            },
+            playChime() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3); // C6
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            },
+            playPop() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            },
+            playFanfare() {
+                this.init();
+                if (!this.ctx) return;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => {
+                        const now = this.ctx.currentTime;
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(freq, now);
+                        gain.gain.setValueAtTime(0.15, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.3);
+                    }, idx * 120);
+                });
+            }
+        };
+
+        // State variables
+        let currentDateStr = "";
+        let attendanceData = {}; // Format: { "Zahra": { status: "Hadir", time: "07:15" }, ... }
+
+        // -------------------------------------------------------------
+        // APPLICATION INITIALIZATION
+        // -------------------------------------------------------------
+        window.onload = function() {
+            startClock();
+            setCurrentDate();
+            loadAttendanceForDate(currentDateStr);
+            renderStudentGrid();
+            updateStats();
+        };
+
+        function setCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            currentDateStr = `${year}-${month}-${day}`;
+
+            // Update UI Date string
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = now.toLocaleDateString('id-ID', options);
+            document.getElementById('liveDate').innerText = formattedDate;
+            document.getElementById('printDateHeader').innerText = formattedDate;
+            document.getElementById('printFooterDate').innerText = formattedDate;
+            document.getElementById('exportTodayBadge').innerText = currentDateStr;
+
+            // Set default date picker values
+            document.getElementById('teacherDatePicker').value = currentDateStr;
+            document.getElementById('exportStartDate').value = `${year}-${month}-01`;
+            document.getElementById('exportEndDate').value = currentDateStr;
+        }
+
+        function startClock() {
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds}`;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // -------------------------------------------------------------
+        // STORAGE & DATA MANAGEMENT
+        // -------------------------------------------------------------
+        function getStorageKey(dateStr) {
+            return `absensi_3a_${dateStr}`;
+        }
+
+        function loadAttendanceForDate(dateStr) {
+            const raw = localStorage.getItem(getStorageKey(dateStr));
+            if (raw) {
+                try {
+                    attendanceData = JSON.parse(raw);
+                } catch(e) {
+                    attendanceData = createEmptyAttendance();
+                }
+            } else {
+                attendanceData = createEmptyAttendance();
+            }
+            
+            // Record this date in index of dates
+            registerDateIndex(dateStr);
+        }
+
+        function createEmptyAttendance() {
+            const obj = {};
+            STUDENT_NAMES.forEach(name => {
+                obj[name] = {
+                    status: 'Belum',
+                    time: '-'
+                };
+            });
+            return obj;
+        }
+
+        function saveCurrentAttendance() {
+            localStorage.setItem(getStorageKey(currentDateStr), JSON.stringify(attendanceData));
+            registerDateIndex(currentDateStr);
+        }
+
+        function registerDateIndex(dateStr) {
+            let datesIndex = JSON.parse(localStorage.getItem('absensi_3a_dates') || '[]');
+            if (!datesIndex.includes(dateStr)) {
+                datesIndex.push(dateStr);
+                datesIndex.sort();
+                localStorage.setItem('absensi_3a_dates', JSON.stringify(datesIndex));
+            }
+        }
+
+        // -------------------------------------------------------------
+        // MAIN GRID & STUDENT INTERACTION
+        // -------------------------------------------------------------
+        function renderStudentGrid() {
+            const grid = document.getElementById('studentGrid');
+            grid.innerHTML = '';
+
+            STUDENT_NAMES.forEach((name, index) => {
+                const record = attendanceData[name] || { status: 'Belum', time: '-' };
+                const num = index + 1;
+
+                let cardClass = "card-belum pulse-card";
+                let statusBadge = `<span class="bg-slate-200 text-slate-700 font-bold text-[10px] md:text-xs px-2 py-0.5 rounded-full">⏳ Belum</span>`;
+                let iconSymbol = "👤";
+
+                if (record.status === 'Hadir') {
+                    cardClass = "card-hadir";
+                    statusBadge = `<span class="bg-emerald-600 text-white font-extrabold text-[10px] md:text-xs px-2 py-0.5 rounded-full shadow-sm">✓ HADIR (${record.time})</span>`;
+                    iconSymbol = "😊";
+                } else if (record.status === 'Sakit') {
+                    cardClass = "card-sakit";
+                    statusBadge = `<span class="bg-amber-500 text-white font-extrabold text-[10px] md:text-xs px-2 py-0.5 rounded-full shadow-sm">🤒 SAKIT</span>`;
+                    iconSymbol = "🏥";
+                } else if (record.status === 'Izin') {
+                    cardClass = "card-izin";
+                    statusBadge = `<span class="bg-sky-600 text-white font-extrabold text-[10px] md:text-xs px-2 py-0.5 rounded-full shadow-sm">📝 IZIN</span>`;
+                    iconSymbol = "✉️";
+                } else if (record.status === 'Alpa') {
+                    cardClass = "card-alpa";
+                    statusBadge = `<span class="bg-rose-600 text-white font-extrabold text-[10px] md:text-xs px-2 py-0.5 rounded-full shadow-sm">❌ ALPA</span>`;
+                    iconSymbol = "❓";
+                }
+
+                const card = document.createElement('button');
+                card.type = "button";
+                card.onclick = () => handleStudentTap(name);
+                card.className = `btn-3d rounded-2xl p-1.5 md:p-2.5 flex items-center justify-between transition-all select-none w-full h-full cursor-pointer ${cardClass}`;
+                
+                card.innerHTML = `
+                    <div class="flex items-center space-x-2 md:space-x-3 overflow-hidden">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-white/60 backdrop-blur-sm border border-slate-200/80 shadow-inner flex items-center justify-center text-base md:text-xl shrink-0 font-extrabold">
+                            ${iconSymbol}
+                        </div>
+                        <div class="text-left overflow-hidden">
+                            <div class="text-[10px] md:text-xs text-slate-600 font-bold uppercase tracking-wide">No. ${num}</div>
+                            <div class="font-black text-xs md:text-base leading-tight tracking-wide truncate text-slate-900">${name.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="shrink-0 pl-1">
+                        ${statusBadge}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function handleStudentTap(name) {
+            AudioFX.playPop();
+            const currentRecord = attendanceData[name];
+
+            if (currentRecord.status === 'Hadir') {
+                // Already checked in
+                showGreetingModal(
+                    "😊",
+                    `Kamu Sudah Absen, ${name}!`,
+                    `Kehadiranmu sudah dicatat pada pukul ${currentRecord.time}. Selamat belajar dan tetap semangat! 🌟`
+                );
+                return;
+            }
+
+            if (currentRecord.status !== 'Belum') {
+                // Modified by teacher (Sakit/Izin/Alpa)
+                showGreetingModal(
+                    "ℹ️",
+                    `Status: ${currentRecord.status}`,
+                    `Status ${name} tercatat sebagai ${currentRecord.status}. Minta bantuan Pak Guru jika ada perubahan.`
+                );
+                return;
+            }
+
+            // Mark as HADIR
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            attendanceData[name] = {
+                status: 'Hadir',
+                time: timeStr
+            };
+
+            saveCurrentAttendance();
+            renderStudentGrid();
+            updateStats();
+            AudioFX.playChime();
+
+            // Show celebratory greeting popup
+            showGreetingModal(
+                "🎉",
+                `Halo, ${name}!`,
+                `Selamat belajar hari ini! Tetap semangat dan capai citacitamu! 🚀📚`
+            );
+
+            // Check if all 28 students are checked in
+            checkAllStudentsPresent();
+        }
+
+        function checkAllStudentsPresent() {
+            const totalHadir = Object.values(attendanceData).filter(r => r.status === 'Hadir').length;
+            if (totalHadir === 28) {
+                setTimeout(() => {
+                    AudioFX.playFanfare();
+                    triggerConfetti();
+                    showGreetingModal(
+                        "🎉 HEBAT, KELAS 3A!",
+                        "Semua 28 Siswa Sudah Absen!",
+                        "Seluruh siswa Kelas 3A sudah melakukan absensi hari ini. Selamat belajar dan tetap semangat! 🚀📚"
+                    );
+                }, 800);
+            }
+        }
+
+        function showGreetingModal(icon, title, message) {
+            document.getElementById('greetingIcon').innerText = icon;
+            document.getElementById('greetingTitle').innerText = title;
+            document.getElementById('greetingMessage').innerText = message;
+
+            const modal = document.getElementById('greetingModal');
+            const box = document.getElementById('greetingBox');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-90');
+            box.classList.add('scale-100');
+        }
+
+        function closeGreetingModal() {
+            AudioFX.playPop();
+            const modal = document.getElementById('greetingModal');
+            const box = document.getElementById('greetingBox');
+
+            box.classList.remove('scale-100');
+            box.classList.add('scale-90');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function updateStats() {
+            let hadir = 0, sakit = 0, izin = 0, alpa = 0, belum = 0;
+
+            Object.values(attendanceData).forEach(r => {
+                if (r.status === 'Hadir') hadir++;
+                else if (r.status === 'Sakit') sakit++;
+                else if (r.status === 'Izin') izin++;
+                else if (r.status === 'Alpa') alpa++;
+                else belum++;
+            });
+
+            document.getElementById('statHadir').innerText = `${hadir} / 28`;
+            document.getElementById('statSakit').innerText = sakit;
+            document.getElementById('statIzin').innerText = izin;
+            document.getElementById('statAlpa').innerText = alpa;
+            document.getElementById('statBelum').innerText = belum;
+
+            // Teacher Dashboard stats update
+            document.getElementById('tdHadir').innerText = hadir;
+            document.getElementById('tdSakit').innerText = sakit;
+            document.getElementById('tdIzin').innerText = izin;
+            document.getElementById('tdAlpa').innerText = alpa;
+            document.getElementById('tdBelum').innerText = belum;
+
+            // Print stats update
+            document.getElementById('printHadirCount').innerText = hadir;
+            document.getElementById('printSakitCount').innerText = sakit;
+            document.getElementById('printIzinCount').innerText = izin;
+            document.getElementById('printAlpaCount').innerText = alpa;
+            document.getElementById('printBelumCount').innerText = belum;
+        }
+
+        // -------------------------------------------------------------
+        // TEACHER MODE & EDITING
+        // -------------------------------------------------------------
+        function openTeacherAuth() {
+            AudioFX.playPop();
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinError').classList.add('hidden');
+            document.getElementById('teacherAuthModal').classList.remove('hidden');
+        }
+
+        function closeTeacherAuth() {
+            document.getElementById('teacherAuthModal').classList.add('hidden');
+        }
+
+        function verifyTeacherPin() {
+            const input = document.getElementById('pinInput').value;
+            if (input === TEACHER_PIN || input === "1234") {
+                closeTeacherAuth();
+                openTeacherDashboard();
+            } else {
+                document.getElementById('pinError').classList.remove('hidden');
+            }
+        }
+
+        function openTeacherDashboard() {
+            document.getElementById('teacherDashboardModal').classList.remove('hidden');
+            renderTeacherTable();
+        }
+
+        function closeTeacherDashboard() {
+            document.getElementById('teacherDashboardModal').classList.add('hidden');
+            renderStudentGrid();
+            updateStats();
+        }
+
+        function loadTeacherDateData() {
+            const selectedDate = document.getElementById('teacherDatePicker').value;
+            if (selectedDate) {
+                loadAttendanceForDate(selectedDate);
+                renderTeacherTable();
+                updateStats();
+            }
+        }
+
+        function renderTeacherTable() {
+            const tbody = document.getElementById('teacherStudentTable');
+            tbody.innerHTML = '';
+
+            STUDENT_NAMES.forEach((name, index) => {
+                const record = attendanceData[name] || { status: 'Belum', time: '-' };
+                const num = index + 1;
+
+                const row = document.createElement('div');
+                row.className = "p-3 flex flex-wrap items-center justify-between gap-2 hover:bg-slate-50 transition";
+
+                row.innerHTML = `
+                    <div class="flex items-center space-x-3 w-48">
+                        <span class="font-bold text-slate-400 text-xs w-6">${num}.</span>
+                        <div>
+                            <span class="font-extrabold text-slate-800 text-sm block">${name}</span>
+                            <span class="text-[10px] text-slate-400 font-medium">Waktu: ${record.time}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+                        <button onclick="changeStudentStatus('${name}', 'Hadir')" class="px-2.5 py-1 text-xs font-bold rounded-lg ${record.status === 'Hadir' ? 'bg-emerald-600 text-white shadow' : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'}">✓ Hadir</button>
+                        <button onclick="changeStudentStatus('${name}', 'Sakit')" class="px-2.5 py-1 text-xs font-bold rounded-lg ${record.status === 'Sakit' ? 'bg-amber-500 text-white shadow' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}">🤒 Sakit</button>
+                        <button onclick="changeStudentStatus('${name}', 'Izin')" class="px-2.5 py-1 text-xs font-bold rounded-lg ${record.status === 'Izin' ? 'bg-sky-600 text-white shadow' : 'bg-sky-100 text-sky-800 hover:bg-sky-200'}">📝 Izin</button>
+                        <button onclick="changeStudentStatus('${name}', 'Alpa')" class="px-2.5 py-1 text-xs font-bold rounded-lg ${record.status === 'Alpa' ? 'bg-rose-600 text-white shadow' : 'bg-rose-100 text-rose-800 hover:bg-rose-200'}">❌ Alpa</button>
+                        <button onclick="changeStudentStatus('${name}', 'Belum')" class="px-2.5 py-1 text-xs font-bold rounded-lg ${record.status === 'Belum' ? 'bg-slate-600 text-white shadow' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}">⏳ Belum</button>
+                    </div>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function changeStudentStatus(name, newStatus) {
+            AudioFX.playPop();
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            attendanceData[name] = {
+                status: newStatus,
+                time: newStatus === 'Belum' ? '-' : (attendanceData[name].time !== '-' ? attendanceData[name].time : timeStr)
+            };
+
+            saveCurrentAttendance();
+            renderTeacherTable();
+            updateStats();
+        }
+
+        function confirmResetToday() {
+            if (confirm("Apakah Anda yakin ingin menghapus/reset seluruh absensi hari ini?")) {
+                attendanceData = createEmptyAttendance();
+                saveCurrentAttendance();
+                renderTeacherTable();
+                renderStudentGrid();
+                updateStats();
+                alert("Absensi hari ini berhasil di-reset.");
+            }
+        }
+
+        // -------------------------------------------------------------
+        // EXPORT & REPORT GENERATION (CSV / EXCEL COMPATIBLE)
+        // -------------------------------------------------------------
+        function openExportModal() {
+            document.getElementById('exportModal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.add('hidden');
+        }
+
+        function exportDailyCSV() {
+            const selectedDate = document.getElementById('teacherDatePicker').value || currentDateStr;
+            const raw = localStorage.getItem(getStorageKey(selectedDate));
+            const data = raw ? JSON.parse(raw) : createEmptyAttendance();
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM for Microsoft Excel compatibility
+            csvContent += "No,Nama Siswa,Tanggal,Waktu,Status\n";
+
+            STUDENT_NAMES.forEach((name, idx) => {
+                const rec = data[name] || { status: 'Belum', time: '-' };
+                csvContent += `${idx + 1},"${name}",${selectedDate},${rec.time},${rec.status}\n`;
+            });
+
+            const fileName = `Absensi_Kelas_3A_${selectedDate}.csv`;
+            downloadFile(csvContent, fileName, 'text/csv;charset=utf-8;');
+        }
+
+        function exportPeriodCSV() {
+            const startDateStr = document.getElementById('exportStartDate').value;
+            const endDateStr = document.getElementById('exportEndDate').value;
+
+            if (!startDateStr || !endDateStr) {
+                alert("Pilih tanggal mulai dan tanggal akhir terlebih dahulu!");
+                return;
+            }
+
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+
+            if (startDate > endDate) {
+                alert("Tanggal mulai tidak boleh lebih besar dari tanggal akhir!");
+                return;
+            }
+
+            // Build array of dates in range
+            const dateList = [];
+            let curr = new Date(startDate);
+            while (curr <= endDate) {
+                const year = curr.getFullYear();
+                const month = String(curr.getMonth() + 1).padStart(2, '0');
+                const day = String(curr.getDate()).padStart(2, '0');
+                dateList.push(`${year}-${month}-${day}`);
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            // Load data for all dates in range
+            const periodData = {};
+            dateList.forEach(d => {
+                const raw = localStorage.getItem(getStorageKey(d));
+                periodData[d] = raw ? JSON.parse(raw) : createEmptyAttendance();
+            });
+
+            // Build CSV Header
+            let csvContent = "\uFEFF"; // UTF-8 BOM
+            const formattedHeaderDates = dateList.map(d => d.slice(5).replace('-', '/')).join(',');
+            csvContent += `No,Nama Siswa,${formattedHeaderDates},Total Hadir,Total Sakit,Total Izin,Total Alpa\n`;
+
+            // Build Student Rows
+            STUDENT_NAMES.forEach((name, idx) => {
+                let rowStr = `${idx + 1},"${name}"`;
+                let totalH = 0, totalS = 0, totalI = 0, totalA = 0;
+
+                dateList.forEach(d => {
+                    const status = periodData[d][name] ? periodData[d][name].status : 'Belum';
+                    let code = '–';
+                    if (status === 'Hadir') { code = 'H'; totalH++; }
+                    else if (status === 'Sakit') { code = 'S'; totalS++; }
+                    else if (status === 'Izin') { code = 'I'; totalI++; }
+                    else if (status === 'Alpa') { code = 'A'; totalA++; }
+
+                    rowStr += `,${code}`;
+                });
+
+                rowStr += `,${totalH},${totalS},${totalI},${totalA}\n`;
+                csvContent += rowStr;
+            });
+
+            const fileName = `Rekap_Absensi_Kelas_3A_${startDateStr}_s.d_${endDateStr}.csv`;
+            downloadFile(csvContent, fileName, 'text/csv;charset=utf-8;');
+        }
+
+        function downloadFile(content, fileName, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // -------------------------------------------------------------
+        // PRINT REPORT LAYOUT GENERATOR
+        // -------------------------------------------------------------
+        function triggerPrint() {
+            // Populate Print Table
+            const tbody = document.getElementById('printTableBody');
+            tbody.innerHTML = '';
+
+            STUDENT_NAMES.forEach((name, idx) => {
+                const rec = attendanceData[name] || { status: 'Belum', time: '-' };
+                const tr = document.createElement('tr');
+                tr.className = idx % 2 === 0 ? "bg-white" : "bg-slate-50";
+
+                tr.innerHTML = `
+                    <td class="border border-slate-400 p-1.5 text-center font-bold">${idx + 1}</td>
+                    <td class="border border-slate-400 p-1.5 font-bold">${name}</td>
+                    <td class="border border-slate-400 p-1.5 text-center">${currentDateStr}</td>
+                    <td class="border border-slate-400 p-1.5 text-center">${rec.time}</td>
+                    <td class="border border-slate-400 p-1.5 text-center font-bold">${rec.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateStats();
+            window.print();
+        }
+
+        // -------------------------------------------------------------
+        // CONFETTI ANIMATION ENGINE (OFFLINE HTML5 CANVAS)
+        // -------------------------------------------------------------
+        function triggerConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899'];
+
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: Math.random() * 4 - 2,
+                    vy: Math.random() * 5 + 3,
+                    rotation: Math.random() * 360
+                });
+            }
+
+            let animationFrame;
+            let startTime = Date.now();
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.rotation += 5;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (Date.now() - startTime < 4000) {
+                    animationFrame = requestAnimationFrame(render);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    cancelAnimationFrame(animationFrame);
+                }
+            }
+
+            render();
+        }
+    </script>
+</body>
+</html>
